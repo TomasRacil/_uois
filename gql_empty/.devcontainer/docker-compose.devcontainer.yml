@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  gql_empty:
+    image: gql_empty
+    build:
+      context: ./gql_empty
+      # context: ./gql_empty/.devcontainer
+      dockerfile: ./.devcontainer/Dockerfile
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    # depends_on:
+    #   - postgres
+    #   - gql_ug
+    ports:
+      - 31128:8000
+    volumes:
+      # Mount the root folder that contains .git
+      - .:/workspace:cached
+    tty: true
+    # command: /bin/sh -c "while sleep 1000; do :; done"
