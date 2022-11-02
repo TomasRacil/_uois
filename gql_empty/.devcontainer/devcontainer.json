@@ -16,9 +16,14 @@
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/workspace/gql_empty",
 	// Set *default* container specific settings.json values on container create.
-	"settings": {},
+	"settings": {
+		"workbench.colorTheme": "United Ubuntu"
+	},
 	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [],
+	"extensions": [
+		"eamodio.gitlens",
+		"SolarLiner.linux-themes"
+	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Uncomment the next line if you want start specific services in your Docker Compose config.
