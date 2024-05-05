@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   frontend:
-    image: hrbolek/frontend
+    image: hrbolek/frontend:0.8.5
     environment:
       - DEMO=False
       - DEMODATA=True
@@ -28,7 +28,7 @@ services:
     # volumes:
     # # for development
     #   - ./server/htmls:/app/server/htmls
-    #   - ./server/config.json:/app/server/config.json
+    #   - ./server/config.json:/app/server/config.jsone
     depends_on:
       - postgres_credentials
 
@@ -76,11 +76,11 @@ services:
       - gql_surveys
 
   gql_ug:
-    image: hrbolek/gql_ug #   image: kavic/ug
+    image: hrbolek/gql_ug:0.8.5 #   image: kavic/ug
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_ug:5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -99,15 +99,15 @@ services:
     # ports:
     #   - 33012:8000
     depends_on:
-      - postgres_gql
+      - postgres_gql_ug
 
   gql_events:
     # image: nafreju2/gql_events # where u user.events
-    image: hrbolek/gql_events # where u user.events
+    image: hrbolek/gql_events:0.8.5 # where u user.events
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_events:5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -127,66 +127,14 @@ services:
     # ports:
     #   - 33331:8000
     depends_on:
-      - postgres_gql
-
-  gql_facilities:
-    image: hrbolek/gql_facilities 
-    environment:
-      # link na db mimo stack
-      # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=example
-      - POSTGRES_DB=data
-      - GQLUG_ENDPOINT_URL=http://gql_ug:8000/gql
-      - JWTPUBLICKEYURL=http://frontend:8000/oauth/publickey
-      - JWTRESOLVEUSERPATHURL=http://frontend:8000/oauth/userinfo
-      - DEMO=False
-      - DEMODATA=True
-    healthcheck:
-      # definice, umoznujici provest test, zda je kontejner v poradku
-      test: "curl -f -H 'Content-Type: application/json' -X POST -d '{\"query\":\"query{__schema{types{name}}}\"}' http://localhost:8000/gql || exit 1"
-      interval: 60s
-      retries: 3
-      start_period: 60s
-      timeout: 10s
-    restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
-    # ports:
-    #   - 33331:8000
-    depends_on:
-      - postgres_gql
-
-  gql_granting:
-    image: hrbolek/gql_granting # where u user.events
-    environment:
-      # link na db mimo stack
-      # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=example
-      - POSTGRES_DB=data
-      - GQLUG_ENDPOINT_URL=http://gql_ug:8000/gql
-      - JWTPUBLICKEYURL=http://frontend:8000/oauth/publickey
-      - JWTRESOLVEUSERPATHURL=http://frontend:8000/oauth/userinfo
-      - DEMO=False
-      - DEMODATA=True
-    healthcheck:
-      # definice, umoznujici provest test, zda je kontejner v poradku
-      test: "curl -f -H 'Content-Type: application/json' -X POST -d '{\"query\":\"query{__schema{types{name}}}\"}' http://localhost:8000/gql || exit 1"
-      interval: 60s
-      retries: 3
-      start_period: 60s
-      timeout: 10s
-    restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
-    depends_on:
-      - postgres_gql
+      - postgres_gql_events
 
   gql_forms:
-    image: hrbolek/gql_forms
+    image: hrbolek/gql_forms:0.8.5
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_forms:5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -206,14 +154,67 @@ services:
     # ports:
     #   - 33013:8000
     depends_on:
-      - postgres_gql
+      - postgres_gql_forms
 
-  gql_projects:
-    image: hrbolek/gql_projects # frajxd/gql_projects # hrbolek/gql_projects
+  gql_facilities:
+    image: hrbolek/gql_facilities:0.8.5
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_facilities:5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+      - GQLUG_ENDPOINT_URL=http://gql_ug:8000/gql
+      - JWTPUBLICKEYURL=http://frontend:8000/oauth/publickey
+      - JWTRESOLVEUSERPATHURL=http://frontend:8000/oauth/userinfo
+      - DEMO=False
+      - DEMODATA=True
+    healthcheck:
+      # definice, umoznujici provest test, zda je kontejner v poradku
+      test: "curl -f -H 'Content-Type: application/json' -X POST -d '{\"query\":\"query{__schema{types{name}}}\"}' http://localhost:8000/gql || exit 1"
+      interval: 60s
+      retries: 3
+      start_period: 60s
+      timeout: 10s
+    restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
+    # ports:
+    #   - 33331:8000
+    depends_on:
+      - postgres_gql_facilities
+
+  gql_granting:
+    image: hrbolek/gql_granting:0.8.5 # where u user.events
+    environment:
+      # link na db mimo stack
+      # - POSTGRES_HOST=host.docker.internal:5432
+      - POSTGRES_HOST=postgres_gql_granting:5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+      - GQLUG_ENDPOINT_URL=http://gql_ug:8000/gql
+      - JWTPUBLICKEYURL=http://frontend:8000/oauth/publickey
+      - JWTRESOLVEUSERPATHURL=http://frontend:8000/oauth/userinfo
+      - DEMO=False
+      - DEMODATA=True
+    healthcheck:
+      # definice, umoznujici provest test, zda je kontejner v poradku
+      test: "curl -f -H 'Content-Type: application/json' -X POST -d '{\"query\":\"query{__schema{types{name}}}\"}' http://localhost:8000/gql || exit 1"
+      interval: 60s
+      retries: 3
+      start_period: 60s
+      timeout: 10s
+    restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
+    depends_on:
+      - postgres_gql_granting
+
+
+  gql_projects:
+    image: hrbolek/gql_projects:0.8.5 # frajxd/gql_projects # hrbolek/gql_projects
+    environment:
+      # link na db mimo stack
+      # - POSTGRES_HOST=host.docker.internal:5432
+      - POSTGRES_HOST=postgres_gql_projects:5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -234,14 +235,14 @@ services:
     #   - 33013:8000
     command: uvicorn main:app --host 0.0.0.0 --port 8000
     depends_on:
-      - postgres_gql
+      - postgres_gql_projects
 
   gql_publications:
-    image: hrbolek/gql_publications # kozmycz/gql_publications_a
+    image: hrbolek/gql_publications:0.8.5 # kozmycz/gql_publications_a
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_publications:5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -261,14 +262,14 @@ services:
     # ports:
     #   - 33013:8000
     depends_on:
-      - postgres_gql
+      - postgres_gql_publications
 
   gql_lessons:
     image: hrbolek/gql_lessons:0.8.5 # onickdock/gql_lessons_dev
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_lessons::5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -288,7 +289,7 @@ services:
     # ports:
     #   - 33013:8000
     depends_on:
-      - postgres_gql
+      - postgres_gql_lessons
 
 
   gql_surveys:
@@ -296,7 +297,7 @@ services:
     environment:
       # link na db mimo stack
       # - POSTGRES_HOST=host.docker.internal:5432
-      - POSTGRES_HOST=postgres_gql:5432
+      - POSTGRES_HOST=postgres_gql_surveys:5432
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
@@ -316,23 +317,99 @@ services:
     # ports:
     #   - 33013:8000
     depends_on:
-      - postgres_gql
+      - postgres_gql_surveys
 
-  postgres_gql:
+  postgres_gql_ug:
     image: postgres
     environment:
       # promenne, ktere lze cist v kontejneru
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=example
       - POSTGRES_DB=data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
-      interval: 60s
-      timeout: 10s
-      retries: 5
-    restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
     ports:
       - 5432:5432
+
+##Hacking days - PostgresDB segmentation
+
+  postgres_gql_events:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5433:5432
+
+  postgres_gql_forms:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5434:5432
+
+  postgres_gql_facilities:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5435:5432
+  
+  postgres_gql_granting:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5436:5432
+
+  postgres_gql_projects:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5437:5432
+      
+  postgres_gql_publications:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5438:5432
+
+  postgres_gql_lessons:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5439:5432
+      
+  postgres_gql_surveys:
+    image: postgres
+    environment:
+      # promenne, ktere lze cist v kontejneru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=example
+      - POSTGRES_DB=data
+    ports:
+      - 5440:5432
 
   postgres_credentials:
     image: postgres
