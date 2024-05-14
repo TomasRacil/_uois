@@ -94,5 +94,12 @@
         "title": "DEMO",
         "authors": ":)",
         "markdownfile": "form.md"
+    },
+    "debug": { 
+        "file": "debug.html",
+        "title": "Debug",
+        "authors": "Hrbolek",
+        "markdownfile": "debug.md"
     }
+
 }

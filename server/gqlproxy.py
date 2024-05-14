@@ -31,12 +31,16 @@ def connectProxy(app):
     @collectTime("gqlquery")
     @app.post("/gql", response_class=JSONResponse)
     async def apigql_post(data: Item, request: Request):
-        gqlQuery = {"query": data.query}
-        if (data.variables) is not None:
-            gqlQuery["variables"] = data.variables
+        print(data)
+        gqlQuery = {}
         if (data.operationName) is not None:
             gqlQuery["operationName"] = data.operationName
 
+        gqlQuery["query"] = data.query
+        if (data.variables) is not None:
+            gqlQuery["variables"] = data.variables
+
+        print(gqlQuery)
         # print(demoquery)
         headers = request.headers
         print(headers)
@@ -47,6 +51,9 @@ def connectProxy(app):
         authorizationHeader = c.get("authorization", None)
         if authorizationHeader is not None:
             headers["authorization"] = authorizationHeader
+        AuthorizationHeader = c.get("Authorization", None)
+        if authorizationHeader is not None:
+            headers["Authorization"] = AuthorizationHeader
         print("outgoing:", headers)
         async with aiohttp.ClientSession() as session:
             async with session.post(proxy, json=gqlQuery, headers=headers) as resp:
