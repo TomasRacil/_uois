@@ -377,6 +377,8 @@ services:
       timeout: 10s
       retries: 5
     restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
+    ports:
+      - 5433:5432
 
   pgadmin:
     image: dpage/pgadmin4

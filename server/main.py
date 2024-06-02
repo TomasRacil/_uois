@@ -105,6 +105,10 @@ from .appindex import createIndexResponse
 
 # from .authenticationMiddleware import BasicAuthenticationMiddleware302, BasicAuthBackend
 from uoishelpers.authenticationMiddleware import BasicAuthenticationMiddleware302, BasicAuthBackend
+
+#prepiseme BasicAuthBackend pomoci plneho 4. fazoveho, ten zabezpeci funkcnot pri zrusenem tokenu
+from .BasicAuthBackend4Phase import BasicAuthBackend4Phase as BasicAuthBackend
+
 JWTPUBLICKEY = os.environ.get("JWTPUBLICKEY", "http://localhost:8000/oauth/publickey")
 JWTRESOLVEUSERPATH = os.environ.get("JWTRESOLVEUSERPATH", "http://localhost:8000/oauth/userinfo")
 
@@ -256,6 +260,15 @@ if not DEMO:
 
 app.mount("/debug", debugApp)
 
-@app.get("/")
+indexApp = FastAPI()
+@indexApp.get("/")
 async def index(request: Request):
     return await createIndexResponse(request=request)
+app.mount("/index", indexApp)
+
+if not DEMO:
+    indexApp.add_middleware(BasicAuthenticationMiddleware302, backend=BasicAuthBackend(JWTPUBLICKEY=JWTPUBLICKEY, JWTRESOLVEUSERPATH=JWTRESOLVEUSERPATH))
+
+@app.get("/")
+async def index(request: Request):
+    return RedirectResponse("/index", status_code=302)

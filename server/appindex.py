@@ -54,7 +54,7 @@ async def createIndexResponse(request: Request):
    
         
     <script src="https://cdn.jsdelivr.net/npm/@hrbolek/uoisfrontend-search/dist/umd/index.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@hrbolek/uoisfrontend-shared/dist/umd/index.js"></script>    
   </head>
   <body>
     <div class="container-fluid p-5 bg-light text-end">
@@ -62,8 +62,8 @@ async def createIndexResponse(request: Request):
           <div class="col col-md-10 text-center">
     	        <h1>Laboratory IS</h1>
           </div>
-          <div class="col col-md-2 text-end">
-                <a href="/logout" class="btn btn-outline-primary">Logout</a>
+          <div class="col col-md-2 text-end" id="logbutton">
+
           </div>
         </div>
     </div>
@@ -82,8 +82,16 @@ async def createIndexResponse(request: Request):
     <script>
       const {{ App }} = Search
       ReactDOM.createRoot(document.getElementById('search')).render(
-        React.createElement(App)
+        React.createElement(Search.App)
       )      
+
+      console.log(Object.keys(Shared))
+      ReactDOM.createRoot(document.getElementById('logbutton')).render(
+        React.createElement(Shared.AppCanvas, {{}}, React.createElement(Shared.LogButton))
+      )      
+
+      
+      
     </script>
 
   </body>

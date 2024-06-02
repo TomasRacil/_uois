@@ -580,3 +580,7 @@ services:
     # for development
       - ./server/htmls:/app/server/htmls
 ```
+
+```bash
+uvicorn server.main:app --env-file environment.txt --port 8008 --reload
+```
