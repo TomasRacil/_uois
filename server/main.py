@@ -1,7 +1,8 @@
 import logging
 import os
+import aiohttp
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from contextlib import asynccontextmanager
 
@@ -260,6 +261,13 @@ if not DEMO:
 
 app.mount("/debug", debugApp)
 
+#######################################################################
+#
+# tato cast je pro index - portal
+# je dostupna jen s autentizaci
+#
+#######################################################################
+
 indexApp = FastAPI()
 @indexApp.get("/")
 async def index(request: Request):
@@ -268,6 +276,53 @@ app.mount("/index", indexApp)
 
 if not DEMO:
     indexApp.add_middleware(BasicAuthenticationMiddleware302, backend=BasicAuthBackend(JWTPUBLICKEY=JWTPUBLICKEY, JWTRESOLVEUSERPATH=JWTRESOLVEUSERPATH))
+
+#######################################################################
+#
+# tato cast je pro index - portal
+# je dostupna jen s autentizaci
+#
+#######################################################################
+
+analyticsApp = FastAPI()
+@analyticsApp.get("/{file_path:path}/")
+async def analytics(file_path, request: Request):
+    
+    headers = dict(request.headers)
+    query_params=request.query_params
+    fullurl = (request.url.include_query_params(**query_params))
+    # print(fullurl)
+    path = request.url.path
+    fulluri = path + f"{fullurl}".split(request.url.path)[1]
+    # fulluri = (request._url)
+    # fulluri = (request.url.path)
+    # print(fulluri)
+    remoteurl = f"http://analytics:8000{fulluri}"
+    # print(remoteurl)
+    try:
+        print("remoteurl", remoteurl)
+        print("headers", headers)
+        del headers["host"]
+        async with aiohttp.ClientSession() as session:
+            async with session.get(remoteurl, headers=headers) as resp:
+                # print(resp.status)
+                text = await resp.text()
+    except Exception as e:
+        print("except", e)
+            
+    return HTMLResponse(content=text, status_code=resp.status)
+    
+app.mount("/analysis", analyticsApp)
+
+if not DEMO:
+    indexApp.add_middleware(BasicAuthenticationMiddleware302, backend=BasicAuthBackend(JWTPUBLICKEY=JWTPUBLICKEY, JWTRESOLVEUSERPATH=JWTRESOLVEUSERPATH))
+
+#######################################################################
+#
+# tato cast je pro root
+# je dostupna bez autentizace, ale dela jen presmerovani
+#
+#######################################################################
 
 @app.get("/")
 async def index(request: Request):

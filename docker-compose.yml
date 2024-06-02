@@ -380,6 +380,12 @@ services:
     ports:
       - 5433:5432
 
+  analytics:
+    image: hrbolek/analytics
+    environment:
+      - GQL_PROXY=http://apollo:3000/api/gql/
+    restart: on-failure:3 # nedojde k restartu pokud je kontejner "unhealthy", maximalne 3 pokusy
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
