@@ -1,4 +1,4 @@
-version: "3.8"
+eversion: "3.8"
 
 services:
   frontend:
@@ -383,7 +383,6 @@ services:
       
   postgres_gql_publications:
     image: postgres
-    
     environment:
       # promenne, ktere lze cist v kontejneru
       - POSTGRES_USER=postgres
